@@ -27,7 +27,7 @@ jobs:
             elements: "q"
           params:
             units: metric
-            appid: "{{ env.OpenWeatherAPIToken }}"
+            appid: "{{ env.OPENWEATHER_API_TOKEN }}"
 
       - asset: open_weather_json
         module: json_mapper
