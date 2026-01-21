@@ -1,16 +1,16 @@
 # Some parts are copied from dagster guide
 # https://docs.dagster.io/guides/deploy/deployment-options/docker
 # Dagster server and daemon image
-FROM python:3.10-slim
+FROM python:3.14-slim
 
 RUN pip install \
-    dagster==1.10.13  \
-    dagster-docker==0.26.13  \
-    dagster-postgres==0.26.13  \
-    minio==7.2.15 \
-    pandas==2.2.3  \ 
-    aiohttp==3.11.18 \
-    dagster-aws==0.26.13 \
+    dagster==1.12.11  \
+    dagster-docker==0.28.11  \
+    dagster-postgres==0.28.11  \
+    minio==7.2.20 \
+    pandas==3.0.0  \
+    aiohttp==3.13.3 \
+    dagster-aws==0.28.11 \
     dagster-factory-pipelines==0.1.15
 
 # Add code location code
