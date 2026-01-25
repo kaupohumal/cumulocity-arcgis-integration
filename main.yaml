@@ -275,3 +275,8 @@ jobs:
 
   - template: jobs/inventory_maker.yaml
     prefix: _cumu_inv
+
+  - template: jobs/open-weather.yaml
+    prefix: _open_weather
+    vars:
+      job_name: open_weather

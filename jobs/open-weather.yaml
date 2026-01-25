@@ -1,0 +1,82 @@
+resources: # required resource for working with ArcGIS API
+  - resource: ArcGIS
+    name: arcGIS
+    params:
+      token: ARCGIS_API
+      feature_service_address: "{{ env.FEATURE_SERVER }}"
+
+jobs:
+  - job: estonia_weather
+    schedule:
+      cron: "*/5 * * * *" # run pipeline every 5min
+      m_test: True
+    partition:
+      elements:
+        - tartu
+        - tallinn
+        - narva
+        - pärnu
+        - haapsalu
+    assets:
+      - asset: tartu_weather
+        group: open_weather
+        module: http_get
+        params:
+          endpoint: https://api.openweathermap.org/data/2.5/weather
+          partition_mapping: # can use the pk approach here will, be  https://api.openweathermap.org/data/2.5/weather?q={static}
+            elements: "q"
+          params:
+            units: metric
+            appid: "{{ env.OPENWEATHER_API_TOKEN }}"
+
+      - asset: open_weather_json
+        module: json_mapper
+        group: open_weather
+        ins: tartu_weather
+        params:
+          mappings:
+            lon: coord.lon
+            lat: coord.lat
+            weather_condition: weather[0].main
+            wind_speed: wind.speed
+            temp: main.temp
+            pressure: main.pressure
+            humidity: main.humidity
+            city: name
+
+      # - asset: send_open_weather_data_to_influxdb
+      #   module: http.post.influxdb
+      #   ins: open_weather_json
+      #   group: influxdb
+      #   params:
+      #     endpoint: http://localhost:8086/write?db=open_weather
+      #     measurement: weather
+      #     tags: city={static}
+
+      - asset: weather_timestamp
+        module: date.timestamp
+        ins: open_weather_json
+        group: open_weather
+        params:
+          timestamp_name: date_
+
+      - asset: transform_to_arcgis_format
+        group: arcgis
+        ins: weather_timestamp
+        module: transform_to_argcis_format
+        params:
+          lng: lon # open weather has different lng name -> lon
+
+      - asset: send_data_to_arcgis
+        ins: transform_to_arcgis_format
+        module: send_to_arcgis
+        group: arcgis
+        params:
+          create_sublayer: True
+          layer_name: Layer_1
+          sublayer_name: OpenWeatherTest
+          create_cols: True
+          col_types:
+            city: esriFieldTypeString
+            weather_condition: esriFieldTypeString
+            date_: esriFieldTypeDate

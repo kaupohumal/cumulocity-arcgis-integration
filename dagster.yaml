@@ -29,6 +29,7 @@ run_launcher:
       - MINIO_SECRET_KEY
       - MINIO_HOST
       - RA_API
+      - OPENWEATHER_API_TOKEN
     network: dagster_network
     container_kwargs:
       auto_remove: true
