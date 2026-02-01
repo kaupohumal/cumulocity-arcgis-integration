@@ -29,8 +29,6 @@ services:
     env_file: .env
     environment:
       DAGSTER_CURRENT_IMAGE: "dagster_code"
-    volumes:
-      - ./jobs://opt/dagster/app/jobs
     networks:
       - dagster_network
 
